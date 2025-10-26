@@ -15,9 +15,9 @@ export const API_PATHS = {
   INCOME: {
     GET: `/api/income/get-incomes`,
     ADD: `/api/income/add-income`,
-    DELETE: `/api/income/delete-income/:id`,
+    DELETE: `/api/income/delete-income/`,
     DOWNLOAD: `/api/income/download-income`,
   },
-  DASHBOARD: `/api/dashboard/data`,
+  DASHBOARD: `/api/dashboard/`,
   IMAGE_UPLOAD: `/api/auth/profile-image`,
 };

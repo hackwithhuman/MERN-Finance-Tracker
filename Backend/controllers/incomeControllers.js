@@ -41,7 +41,9 @@ exports.getIncomes = async (req, res) => {
         if (!incomes || incomes.length === 0) {
             return res.status(404).json({ message: 'No incomes found' });
         }
-        res.status(200).json({ incomes });
+         const totalIncome = incomes.reduce((sum, inc) => sum + inc.amount, 0);
+        res.status(200).json({ totalIncome ,incomes });
+        
     } catch (error) {
         res.status(500).json({ message: 'Server Error', error: error.message });
     }
@@ -82,6 +84,7 @@ exports.deleteIncome = async(req, res) =>{
     try {
         // const userId = req.user.id;
         const incomeId = req.params.id;
+        // console.log(incomeId)
         const income = await Income.findOne({ _id: incomeId });
         if (!income) {
             return res.status(404).json({ message: "Income not found or not authorized" });

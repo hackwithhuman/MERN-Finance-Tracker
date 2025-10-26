@@ -5,7 +5,7 @@ import { Outlet } from 'react-router-dom'
 
 const DashBoardLayout = () => {
   return (
-     <div className="flex min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="flex min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* ===== Desktop Sidebar ===== */}
       <div className="hidden lg:flex">
         {/* <SideMenu activeMenu={activeMenu} setActiveMenu={setActiveMenu} /> */}

@@ -30,49 +30,49 @@ const SignUp = () => {
 
   const { updateUser } = userCtx;
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    let profileImage = '';
+ const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    if (!name) return setError('*Full Name is required');
-    if (!email) return setError('*Email is required');
-    if (!password || password.length < 6) return setError('*Password must be at least 6 characters'), toast.error("Re-check Password")
-    if (!validateEmail(email)) return setError('*Please enter a valid email address');
+  if (!name) return setError('*Full Name is required');
+  if (!email) return setError('*Email is required');
+  if (!password || password.length < 6)
+    return setError('*Password must be at least 6 characters');
+  if (!validateEmail(email)) return setError('*Please enter a valid email address');
 
-    setError('');
+  setError('');
 
-    try {
-      if (image) {
-        const imgUploadRes = await uploadImage(image);
-        profileImage = imgUploadRes.imageUrl || '';
-      }
+  try {
+   const formData = new FormData();
+formData.append("fullName", name);
+formData.append("email", email);
+formData.append("password", password);
+if (image) formData.append("image", image);  // field name 'image'
 
-      const response = await axiosInstance.post(API_PATHS.AUTH.SIGNUP, {
-        fullName: name,
-        email,
-        password,
-        profileImage,
-      });
+ const response = await axiosInstance.post("/api/auth/register", formData, {
+  headers: { "Content-Type": "multipart/form-data" }
+});
 
-      const { token, user } = response.data;
 
-      if (token) {
-        localStorage.setItem('token', token);
-        updateUser(user);
-        navigate('/dashboard');
-        toast.success("Signup Successful");
-      }
-    } catch (error) {
-      if (error.response && error.response.data.message) {
-        setError(error.response.data.message);
-        toast.error(error.response.data.message);
-      } else {
-        console.error(error); // for debugging
-        setError("Something went wrong");
-        toast.error("Please Check your Internet Connection");
-      }
+    const { token, user } = response.data;
+
+    if (token) {
+      localStorage.setItem("token", token);
+      updateUser(user);
+      navigate("/dashboard");
+      toast.success("Signup Successful");
     }
-  };
+  } catch (error) {
+    if (error.response && error.response.data.message) {
+      setError(error.response.data.message);
+      toast.error(error.response.data.message);
+    } else {
+      console.error(error);
+      setError("Something went wrong");
+      toast.error("Please Check your Internet Connection");
+    }
+  }
+};
+
 
   if (showLogin) return <motion.div
     initial={{ x: '-20%', opacity: 0 }}       // 👈 Start off-screen to the right

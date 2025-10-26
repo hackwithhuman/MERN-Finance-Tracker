@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import axios from "axios";
 
-import { UserProvider } from "./Context/UserContaxt";
+import { UserProvider, UserContext } from "./Context/UserContaxt";
 import LoginLayout from "./Layout/LoginLayout";
 import DashBoardLayout from "./Layout/DashBoardLayout";
 
@@ -36,7 +36,6 @@ function App() {
     (error) => {
       if (error.response && [401, 403].includes(error.response.status)) {
         localStorage.removeItem("token");
-        window.location.replace("/login");
       }
       return Promise.reject(error);
     }
@@ -90,25 +89,31 @@ const RootRedirect = () => {
 
 // Protect all dashboard routes
 const ProtectedRoute = ({ children }) => {
+  const { user, updateUser, clearUser } = useContext(UserContext);
   const [isValid, setIsValid] = useState(null);
 
   useEffect(() => {
-    const validateToken = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setIsValid(false);
-        return;
-      }
-      try {
-        const res = await axiosInstance.get(API_PATHS.AUTH.PROFILE);
-        if (res.data) setIsValid(true);
-      } catch {
-        localStorage.removeItem("token");
-        setIsValid(false);
-      }
-    };
-    validateToken();
-  }, []);
+  const token = localStorage.getItem("token");
+  if (!token) {
+    setIsValid(false);
+    return;
+  }
+
+  const fetchProfile = async () => {
+    try {
+      const res = await axiosInstance.get(API_PATHS.AUTH.PROFILE);
+      if (res.data) updateUser(res.data);
+      setIsValid(true);
+    } catch (err) {
+      clearUser();
+      localStorage.removeItem("token");
+      setIsValid(false);
+    }
+  };
+
+  fetchProfile();
+}, []); // ✅ only once
+
 
   if (isValid === null) {
     return (

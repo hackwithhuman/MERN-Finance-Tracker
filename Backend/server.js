@@ -12,6 +12,7 @@ const dashBoardroutes = require('./routes/dashBoardRoutes');
 const Expense = require('./models/Expense');
 const { error } = require('console');
 const { protect } = require('./middleware/authMiddlewares');
+const User = require("./models/UersSchema");
 
 // Database connection 
 connectDB();
@@ -20,9 +21,9 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors({
-    // origin: process.env.FRONTEND_URL,
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+  // origin: process.env.FRONTEND_URL,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }
 ));
 
@@ -36,7 +37,7 @@ app.use('/api/expenses', expenseRoutes);
 app.use('/api/dashboard', dashBoardroutes);
 
 
-app.post('/api/addexpenses', protect, async(req, res) => {
+app.post('/api/addexpenses', protect, async (req, res) => {
   try {
     const userId = req.user.id;
     const expenses = req.body.expenses;
@@ -60,12 +61,25 @@ app.post('/api/addexpenses', protect, async(req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 });
+
+app.delete("/api/delete", async (req, res) => {
+  try {
+    const deletedUser = await User.deleteMany({});
+    if (deletedUser) {
+      return res.status(200).json({ message: "deletion successfull", deletedUser });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(401).json(error.message)
+  }
+
+})
 app.get('/api', (req, res) => {
-    res.send('Chal Raha hai...');
+  res.send('Chal Raha hai...');
 
 });
 
 // Upload Folder
 app.listen(PORT, () => {
-    console.log(`Server ${PORT} par chal raha hai`);
+  console.log(`Server ${PORT} par chal raha hai`);
 });

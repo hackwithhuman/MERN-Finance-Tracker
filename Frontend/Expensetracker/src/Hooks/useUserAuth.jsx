@@ -1,39 +1,29 @@
 import { useContext, useEffect } from "react";
-import { UserContext } from "../Context/UserContaxt";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../Utils/axiosInstance";
 import { API_PATHS } from "../Utils/apiPath";
+import { UserContext } from "../Context/UserContaxt";
 
 export const useUserAuth = () => {
-  const { user, updateUser, clearUser } = useContext(UserContext);
   const navigate = useNavigate();
+  const { user, updateUser, clearUser } = useContext(UserContext);
 
   useEffect(() => {
-    if (user) return; // already logged in
+  const token = localStorage.getItem("token");
+  if (!token || user) return; // no token or already have user -> do nothing
 
-    let mounted = true;
+  const fetchUser = async () => {
+    try {
+      const res = await axiosInstance.get(API_PATHS.AUTH.PROFILE);
+      if (res.data) updateUser(res.data);
+    } catch (err) {
+      clearUser();
+      localStorage.removeItem("token");
+      navigate("/login", { replace: true }); // replace avoids history loop
+    }
+  };
 
-    const fetchUserInfo = async () => {
-      try {
-        const response = await axiosInstance.get(API_PATHS.AUTH.PROFILE);
-        if (mounted && response.data) {
-          updateUser(response.data);
-        }
-      } catch (err) {
-        console.error("Failed to fetch user:", err);
-        if (mounted) {
-          clearUser();
-          navigate("/login");
-        }
-      }
-    };
+  fetchUser();
+}, [user, updateUser, clearUser, navigate]);
 
-    fetchUserInfo();
-
-    return () => {
-      mounted = false;
-    };
-  // ✅ only run once when component mounts
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 };

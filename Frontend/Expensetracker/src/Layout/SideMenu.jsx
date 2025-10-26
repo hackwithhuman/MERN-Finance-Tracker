@@ -7,7 +7,7 @@ import { HiOutlineLogout } from "react-icons/hi";
 const SideMenu = ({ activeMenu }) => {
   const { user, logoutuser } = useContext(UserContext);
   const navigate = useNavigate();
-
+  // console.log(user);
   const handleClick = (route) => {
     if (route === "logout") {
       handleLogout();
@@ -19,6 +19,7 @@ const SideMenu = ({ activeMenu }) => {
   const handleLogout = () => {
     localStorage.clear();
     logoutuser?.();
+    toast.success("Logout SuccessFull !");
     navigate("/login");
   };
 
@@ -36,7 +37,7 @@ const SideMenu = ({ activeMenu }) => {
         <div className="flex flex-col items-center md:items-start gap-3 mt-6 px-5">
           <img
             src={
-              user?.profileImage ||
+              user?.profilePicURL ||
               `https://ui-avatars.com/api/?name=${user?.fullName || "User"}`
             }
             alt="profile"

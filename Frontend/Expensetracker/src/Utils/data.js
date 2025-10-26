@@ -6,7 +6,7 @@ export const sideMenuData = [
 id:"01",
 label: "dashBoard",
 icon: LuLayoutDashboard,
-paath: "/",
+path: "/",
 
     },
     {
